@@ -2,7 +2,7 @@
 
 ## Introduction
 
-Welcome to Useless Dragon, a terminal-based roguelike game where you play as a dragon brought up in a society of dragons who can transform into humans. 
+Welcome to Useless Dragon, a terminal-based roguelike game where you play as a dragon brought up in a society of dragons who can transform into humans.
 
 Our hero is the Useless Dragon. Dragons have the ability to transform into humans at will and live in a developed society, hunting as dragons when they feel like it. However, Useless Dragon has never been able to transform into a dragon like the rest of his family and friends, leading him to be mocked and called "useless". Little does anyone know, Useless Dragon is actually a Phoenix, a legendary species of dragon that develops their powers much more slowly but has the ability to never truly die.
 
@@ -51,7 +51,7 @@ As the player defeats monsters, they gain experience points (XP) that allow them
 
 Here are some example skills:
 
- Skill Name | Description 
+ Name | Description 
 ------------|--------------- 
 Dragon's Breath	| Breathe fire in Aggressive Stance after 3 rounds, dealing significant damage and stunning the player for the next turn.
  Unyielding Defender | Negate all damage from an incoming attack when in Defensive Stance for more than 3 rounds.  
@@ -67,7 +67,7 @@ In this game monsters will drop **Items** regarding what they carry when they fi
 
 Here are some example items:
 
- Skill Name | Description 
+ Name | Description 
 ------------|--------------- 
 Berserker's Axe		| Increases damage dealt in Aggressive Stance but reduces defense in Defensive Stance.
  Shield of Fortitude	 | Increases damage reduction in Defensive Stance but reduces damage dealt in Aggressive Stance.

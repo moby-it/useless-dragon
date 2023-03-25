@@ -74,7 +74,6 @@ Berserker's Axe		| Increases damage dealt in Aggressive Stance but reduces defen
 Balanced Blade	 | Slightly increases damage dealt in all stances.
 Helm of Focus	| Extends the duration of Aggressive Stance by one turn.
 Chestplate of Resilience	 | Extends the duration of Defensive Stance by one turn.
-
 Ring of Adaptability | Reduces the number of turns required to switch between stances.
 
 Amulet of the Tactician	| Increases the chance to gain an extra action in Normal Stance.

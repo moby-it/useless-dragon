@@ -38,7 +38,7 @@ Each action has a different effect depending on the current stance. For example,
 | Basic Attack |       ✅     |        ✅       |        ✅      |
 | Power Attack | Drakonid (AS)| Drakonid (AS)   | Human (NS)     |
 | Guard        | Phoenix (DS) | Human (NS)     | Phoenix (DS)   |
-| Taunt        | Human (NS) | Normal (NS)     | Normal (NS)   |
+| Taunt        | Human (NS) | Human (NS)     | Human (NS)   |
 | Max Duration |       ∞     |         3       |         3       |
 
 ## Progression

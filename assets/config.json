@@ -1,0 +1,16 @@
+{
+  "buffs": {
+    "reckless": {
+      "duration": 3,
+      "attack": 2,
+      "defence": -2
+    },
+    "stalwart": {
+      "duration": 3,
+      "attack": -2,
+      "defence": 2
+    }
+  },
+  "power attack bonus": 3,
+  "guard defence bonus": 5
+}

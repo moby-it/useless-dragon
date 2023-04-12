@@ -1,7 +1,7 @@
 package termui
 
 import (
-	"log"
+	"os"
 	"useless_dragon/combat"
 
 	"github.com/jroimartin/gocui"
@@ -14,12 +14,13 @@ const (
 )
 
 func Render(c *combat.Combat) (*gocui.Gui, error) {
-	g, err := gocui.NewGui(gocui.OutputNormal)
+	g, err := gocui.NewGui(gocui.Output256)
 	if err != nil {
 		return nil, err
 	}
 	g.Cursor = true
 	g.Highlight = true
+	g.InputEsc = true
 	g.SelFgColor = gocui.ColorBlue
 	g.SetManagerFunc(layout(c))
 	// keybidings
@@ -52,10 +53,12 @@ func Render(c *combat.Combat) (*gocui.Gui, error) {
 			UpdateUI(g, c)
 		}
 	}(g, c)
-	if err := g.MainLoop(); err != nil && err != gocui.ErrQuit {
-		log.Panicln(err)
+	err = g.MainLoop()
+	if err == gocui.ErrQuit {
+		g.Close()
+		os.Exit(0)
 	}
-	return g, nil
+	return g, err
 }
 
 func layout(c *combat.Combat) func(*gocui.Gui) error {

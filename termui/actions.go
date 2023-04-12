@@ -62,6 +62,7 @@ func selectAction(c *combat.Combat) func(g *gocui.Gui, v *gocui.View) error {
 }
 func cancelAction(c *combat.Combat) func(g *gocui.Gui, v *gocui.View) error {
 	return func(g *gocui.Gui, v *gocui.View) error {
+		g.SetCurrentView(ActionsView)
 		selectedAction = nil
 		return nil
 	}

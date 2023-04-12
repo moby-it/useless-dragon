@@ -16,7 +16,7 @@
 				"request": "launch",
 				"console": "integratedTerminal",
 				"mode": "debug",
-				"program": "${fileDirname}"
+				"program": "${workspaceFolder}/main.go"
 			}
 		]
 	},

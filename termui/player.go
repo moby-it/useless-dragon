@@ -10,7 +10,7 @@ import (
 const PlayerStatsWidth = 40
 const leftPadding = 1
 
-func CreatePlayerStats(g *gocui.Gui, c *combat.Combat) error {
+func createPlayerStats(g *gocui.Gui, c *combat.Combat) error {
 	player := c.Player
 	v, err := g.SetView(PlayerStatsView, leftPadding, 3, leftPadding+PlayerStatsWidth, 15)
 	if err != gocui.ErrUnknownView {
@@ -24,7 +24,7 @@ func CreatePlayerStats(g *gocui.Gui, c *combat.Combat) error {
 	}
 	return nil
 }
-func UpdatePlayerStats(g *gocui.Gui, c *combat.Combat) error {
+func updatePlayerStats(g *gocui.Gui, c *combat.Combat) error {
 	player := c.Player
 	v, err := g.View(PlayerStatsView)
 	if err != nil {

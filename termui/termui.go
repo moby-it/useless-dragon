@@ -1,7 +1,7 @@
 package termui
 
 import (
-	"os"
+	"fmt"
 	"useless_dragon/combat"
 
 	"github.com/jroimartin/gocui"
@@ -13,58 +13,34 @@ const (
 	EnemyStatsView  = "enemyStats"
 )
 
-func Render(c *combat.Combat) (*gocui.Gui, error) {
-	g, err := gocui.NewGui(gocui.Output256)
-	if err != nil {
-		return nil, err
-	}
+func Create() *gocui.Gui {
+	// if cannot create cui panic
+	g, _ := gocui.NewGui(gocui.Output256)
 	g.Cursor = true
 	g.Highlight = true
 	g.InputEsc = true
 	g.SelFgColor = gocui.ColorBlue
-	g.SetManagerFunc(layout(c))
-	// keybidings
-	if err := g.SetKeybinding(ActionsView, gocui.KeyCtrlC, gocui.ModNone, quit); err != nil {
-		return nil, err
-	}
-	if err := g.SetKeybinding(ActionsView, gocui.KeyArrowDown, gocui.ModNone, cursorDown); err != nil {
-		return nil, err
-	}
-	if err := g.SetKeybinding(ActionsView, gocui.KeyArrowUp, gocui.ModNone, cursorUp); err != nil {
-		return nil, err
-	}
-	if err := g.SetKeybinding(ActionsView, gocui.KeyEnter, gocui.ModNone, selectAction(c)); err != nil {
-		return nil, err
-	}
-	if err := g.SetKeybinding("", gocui.KeyEnter, gocui.ModNone, selectEnemy(c)); err != nil {
-		return nil, err
-	}
-	if err := g.SetKeybinding("", gocui.KeyArrowRight, gocui.ModNone, nextEnemy(c)); err != nil {
-		return nil, err
-	}
-	if err := g.SetKeybinding("", gocui.KeyArrowLeft, gocui.ModNone, previousEnemy(c)); err != nil {
-		return nil, err
-	}
-	if err := g.SetKeybinding("", gocui.KeyEsc, gocui.ModNone, cancelAction(c)); err != nil {
-		return nil, err
-	}
+	return g
+}
+func RenderCombat(g *gocui.Gui, c *combat.Combat) error {
+	g.SetManagerFunc(combatLayout(c))
+	registerCombatKeybindings(g, c)
 	go func(g *gocui.Gui, c *combat.Combat) {
 		for range c.UpdateUi {
 			UpdateUI(g, c)
 		}
 	}(g, c)
-	err = g.MainLoop()
+	err := g.MainLoop()
 	if err == gocui.ErrQuit && c.Status == combat.Playing {
-		g.Close()
-		os.Exit(0)
+		return fmt.Errorf("game crashed")
 	}
-	return g, nil
+	return nil
 }
 
-func layout(c *combat.Combat) func(*gocui.Gui) error {
+func combatLayout(c *combat.Combat) func(*gocui.Gui) error {
 	return func(g *gocui.Gui) error {
-		CreateActions(g, c)
-		CreatePlayerStats(g, c)
+		createActions(g, c)
+		createPlayerStats(g, c)
 		for i := range c.Enemies {
 			err := createEnemyStats(g, c, i)
 			if err != nil {
@@ -80,6 +56,17 @@ func layout(c *combat.Combat) func(*gocui.Gui) error {
 		return nil
 	}
 
+}
+func registerCombatKeybindings(g *gocui.Gui, c *combat.Combat) {
+	// keybidings
+	g.SetKeybinding(ActionsView, gocui.KeyCtrlC, gocui.ModNone, quit)
+	g.SetKeybinding(ActionsView, gocui.KeyArrowDown, gocui.ModNone, cursorDown)
+	g.SetKeybinding(ActionsView, gocui.KeyArrowUp, gocui.ModNone, cursorUp)
+	g.SetKeybinding(ActionsView, gocui.KeyEnter, gocui.ModNone, selectAction(c))
+	g.SetKeybinding("", gocui.KeyEnter, gocui.ModNone, selectEnemy(c))
+	g.SetKeybinding("", gocui.KeyArrowRight, gocui.ModNone, nextEnemy(c))
+	g.SetKeybinding("", gocui.KeyArrowLeft, gocui.ModNone, previousEnemy(c))
+	g.SetKeybinding("", gocui.KeyEsc, gocui.ModNone, cancelAction(c))
 }
 func quit(g *gocui.Gui, v *gocui.View) error {
 	return gocui.ErrQuit
@@ -111,13 +98,13 @@ func cursorUp(g *gocui.Gui, v *gocui.View) error {
 func UpdateUI(cui *gocui.Gui, c *combat.Combat) {
 	cui.Update(func(g *gocui.Gui) error {
 		// update actions
-		UpdateActions(g, c)
+		updateActions(g, c)
 		// update enemies
 		for i := range c.Enemies {
 			updateEnemyStats(g, c, i)
 		}
 		// update player stats
-		UpdatePlayerStats(g, c)
+		updatePlayerStats(g, c)
 		return nil
 	})
 }

@@ -1,0 +1,13 @@
+{
+  "name":"Red Guard",
+  "description": "Such a strong guy",
+  "health": 200,
+  "attack": 40,
+  "defense": 0,
+  "stance": "Normal",
+  "intents": [
+    "pa",
+    "pa",
+    "pa"
+  ]
+}

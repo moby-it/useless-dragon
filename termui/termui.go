@@ -54,11 +54,11 @@ func Render(c *combat.Combat) (*gocui.Gui, error) {
 		}
 	}(g, c)
 	err = g.MainLoop()
-	if err == gocui.ErrQuit {
+	if err == gocui.ErrQuit && c.Status == combat.Playing {
 		g.Close()
 		os.Exit(0)
 	}
-	return g, err
+	return g, nil
 }
 
 func layout(c *combat.Combat) func(*gocui.Gui) error {

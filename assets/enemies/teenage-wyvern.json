@@ -1,7 +1,7 @@
 {
   "name":"Teenage Wyvern",
   "description": "A wyvern with a bit of a temper.",
-  "health": 10,
+  "health": 100,
   "attack": 15,
   "defense": 0,
   "stance": "Normal",

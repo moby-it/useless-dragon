@@ -61,16 +61,12 @@ func Start(player *Combatant, enemies ...*Enemy) *Combat {
 			playerAction := <-combat.PlayerActionChan
 			combat.AddPlayerAction(&playerAction)
 			combat.ResolveRound()
-			combat.UpdateUi <- true
-			if combat.Status == Lost {
+			if combat.Status != Playing {
 				close(combat.UpdateUi)
 				close(combat.PlayerActionChan)
 				break
-			}
-			if combat.Status == Won {
-				close(combat.UpdateUi)
-				close(combat.PlayerActionChan)
-				break
+			} else {
+				combat.UpdateUi <- true
 			}
 			combat.StartNewRound()
 		}

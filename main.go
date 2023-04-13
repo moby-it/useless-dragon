@@ -15,15 +15,16 @@ func main() {
 	config.Parse()
 	player := parsePlayer()
 	encouters := setup.ParseEncounters()
+	gcui := termui.Create()
 	for _, enemies := range encouters {
 		c := combat.Start(player, enemies...)
-		gcui, err := termui.Render(c)
+		err := termui.RenderCombat(gcui, c)
 		if err != nil {
 			gcui.Close()
 			panic(err)
 		}
-		defer gcui.Close()
 	}
+	gcui.Close()
 }
 func parsePlayer() *combat.Combatant {
 	dir, err := os.Getwd()

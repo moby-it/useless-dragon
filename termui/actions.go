@@ -12,7 +12,7 @@ const ActionsHeight = 10
 
 var selectedAction combat.Executable
 
-func CreateActions(g *gocui.Gui, c *combat.Combat) error {
+func createActions(g *gocui.Gui, c *combat.Combat) error {
 	const topPadding = 18
 	const leftPadding = 1
 	player := c.Player
@@ -27,7 +27,7 @@ func CreateActions(g *gocui.Gui, c *combat.Combat) error {
 	}
 	return nil
 }
-func UpdateActions(g *gocui.Gui, c *combat.Combat) error {
+func updateActions(g *gocui.Gui, c *combat.Combat) error {
 	player := c.Player
 	enemy := c.Enemies[0]
 	v, err := g.View(ActionsView)

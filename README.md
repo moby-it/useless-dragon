@@ -33,12 +33,11 @@ Each action has a different effect depending on the current stance. For example,
 
 ## Actions-Stances Matrix
 
-|              | Human (NS) | Drakonid (AS) | Phoenix (DS) |
+|              | Normal (NS) | Aggressive (AS) | Defensive (DS) |
 |--------------|------------|---------------|---------------|
-| Basic Attack |       ✅     |        ✅       |        ✅      |
-| Power Attack | Drakonid (AS)| Drakonid (AS)   | Human (NS)     |
-| Guard        | Phoenix (DS) | Human (NS)     | Phoenix (DS)   |
-| Taunt        | Human (NS) | Human (NS)     | Human (NS)   |
+| Basic Attack |       ✅     |        ✅ <br>stance duration +1|        ✅      |
+| Power Attack | Aggressive (AS)| Aggressive (AS)   | Normal (NS)     |
+| Guard        | Defensive (DS) | Normal (NS)     | Defensive (DS)<br>stance duration +1|
 | Max Duration |       ∞     |         3       |         3       |
 
 ## Progression

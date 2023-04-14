@@ -28,11 +28,9 @@ func main() {
 			os.Exit(1)
 		}
 	}(wg)
-	for i, enemies := range encounters {
+	for _, enemies := range encounters {
 		c := combat.Start(wg, player, enemies...)
-		log.Println("to start combat", i)
 		updaterChan <- c
-		log.Println("combat", i, "ended")
 	}
 	wg.Wait()
 }

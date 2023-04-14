@@ -10,7 +10,7 @@ import (
 
 const (
 	boxWidth        = 32
-	enemyBoxWidth   = 42
+	enemyBoxWidth   = 46
 	boxHeight       = 8
 	red             = lipgloss.Color("9")
 	blue            = lipgloss.Color("27")
@@ -27,7 +27,7 @@ var (
 	headerStyle     = bold.Copy().Foreground(gray).MarginBottom(1)
 	hoverSyle       = lipgloss.NewStyle().Foreground(hover)
 	boxStyle        = lipgloss.NewStyle().MarginBottom(1).MarginTop(1).BorderStyle(lipgloss.NormalBorder()).Width(boxWidth).Height(boxHeight)
-	focusedBoxStyle = boxStyle.Copy().BorderForeground(blue)
+	focusedBoxStyle = boxStyle.Copy().BorderForeground(blue).Width(boxWidth).Height(boxHeight)
 	statsStyle      = lipgloss.NewStyle().PaddingLeft(1).PaddingRight(1).Width(boxWidth).Height(boxHeight)
 	actionsStyle    = lipgloss.NewStyle().PaddingLeft(1).PaddingRight(1).Width(boxWidth).Height(5)
 )

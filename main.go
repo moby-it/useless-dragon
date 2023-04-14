@@ -21,7 +21,7 @@ func main() {
 	encounters := setup.ParseEncounters()
 	wg.Add(len(encounters))
 	updaterChan := make(chan *combat.Combat)
-	p := tea.NewProgram(termui.InitialModel(updaterChan))
+	p := tea.NewProgram(termui.InitialModel(updaterChan), tea.WithAltScreen())
 	go func(wg *sync.WaitGroup) {
 		if _, err := p.Run(); err != nil {
 			fmt.Printf("Alas, there's been an error: %v", err)

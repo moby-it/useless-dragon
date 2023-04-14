@@ -19,9 +19,9 @@ func renderEnemies(m model) string {
 			enemyText = fmt.Sprint(title, intent, stats)
 		}
 		if m.selectedAction >= 0 && m.cursor == i {
-			enemieViews[i] = focusedBoxStyle.Width(enemyBoxWidth).Height(boxHeight).Render(enemyText)
+			enemieViews[i] = focusedBoxStyle.Copy().Width(enemyBoxWidth).Height(boxHeight).Render(enemyText)
 		} else {
-			enemieViews[i] = boxStyle.Width(enemyBoxWidth).Height(boxHeight).Render(enemyText)
+			enemieViews[i] = boxStyle.Copy().Width(enemyBoxWidth).Height(boxHeight).Render(enemyText)
 		}
 	}
 	return lipgloss.JoinVertical(lipgloss.Bottom, enemieViews...)

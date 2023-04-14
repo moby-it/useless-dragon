@@ -2,68 +2,43 @@ package termui
 
 import (
 	"fmt"
-	"useless_dragon/combat"
-
-	"github.com/jroimartin/gocui"
+	"strings"
+	"useless_dragon/config"
 )
 
-const ActionsWidth = 40
-const ActionsHeight = 10
-
-var selectedAction combat.Executable
-
-func createActions(g *gocui.Gui, c *combat.Combat) error {
-	const topPadding = 18
-	const leftPadding = 1
-	player := c.Player
-	enemy := c.Enemies[0]
-	if v, err := g.SetView(ActionsView, leftPadding, topPadding, leftPadding+ActionsWidth, topPadding+ActionsHeight); err != nil {
-		if err != gocui.ErrUnknownView {
-			return err
+func renderActions(m model) string {
+	player := m.combat.Player
+	title := headerStyle.Render("Actions")
+	ba := fmt.Sprintf("\n  Basic Attack: %v damage", player.Attack)
+	pa := fmt.Sprintf("\n  Power Attack: %v damage", player.Attack+config.Get().PowerAttackBonus)
+	gd := fmt.Sprintf("\n  Guard: Gain %v Defense", config.Get().Guard_Bonus)
+	if m.selectedAction < 0 {
+		switch m.cursor {
+		case 0:
+			ba = addActiveCursorPointer(ba)
+		case 1:
+			pa = addActiveCursorPointer(pa)
+		case 2:
+			gd = addActiveCursorPointer(gd)
 		}
-		v.Title = "Actions"
-		v.Wrap = true
-		printActions(v, player, &enemy.Combatant)
-	}
-	return nil
-}
-func updateActions(g *gocui.Gui, c *combat.Combat) error {
-	player := c.Player
-	enemy := c.Enemies[0]
-	v, err := g.View(ActionsView)
-	if err != nil {
-		return err
-	}
-	v.Clear()
-	selectedAction = nil
-	g.SetCurrentView(ActionsView)
-	printActions(v, player, &enemy.Combatant)
-	return nil
-}
-func selectAction(c *combat.Combat) func(g *gocui.Gui, v *gocui.View) error {
-	return func(g *gocui.Gui, v *gocui.View) error {
-		if c.Player.Health <= 0 {
-			return nil
+	} else {
+		switch m.selectedAction {
+		case 0:
+			ba = addActiveCursorPointer(ba)
+		case 1:
+			pa = addActiveCursorPointer(pa)
+		case 2:
+			gd = addActiveCursorPointer(gd)
 		}
-		_, cy := v.Cursor()
-		if cy == 0 || cy == 1 {
-			selectedAction = combat.CreateBasicAttack()
-			// playerAction = combat.PlayerAction{Action: combat.CreateBasicAttack(), Target: enemy}
-			// c.PlayerActionChan <- playerAction
-
-		} else if cy == 2 || cy == 3 {
-			selectedAction = combat.CreatePowerAttack()
-		} else if cy == 4 || cy == 5 {
-			selectedAction = combat.CreateGuard()
-		}
-		g.SetCurrentView(fmt.Sprintf("%v_0", EnemyStatsView))
-		return nil
 	}
+	actions := title + ba + pa + gd
+	if m.selectedAction < 0 {
+		actions = focusedBoxStyle.Render(actionsStyle.Render(actions))
+	} else {
+		actions = boxStyle.Render(actionsStyle.Render(actions))
+	}
+	return actions
 }
-func cancelAction(c *combat.Combat) func(g *gocui.Gui, v *gocui.View) error {
-	return func(g *gocui.Gui, v *gocui.View) error {
-		g.SetCurrentView(ActionsView)
-		selectedAction = nil
-		return nil
-	}
+func addActiveCursorPointer(text string) string {
+	return hoverSyle.Render(strings.Replace(text, " ", ">", 1))
 }

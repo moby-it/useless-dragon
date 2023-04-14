@@ -1,6 +1,9 @@
 package combat
 
-import "fmt"
+import (
+	"fmt"
+	"sync"
+)
 
 const (
 	Won     = 1
@@ -40,9 +43,14 @@ type PlayerAction struct {
 }
 
 func (playerAction *PlayerAction) Execute(round *Round) {
-	playerAction.Action.Execute(round.Player, &playerAction.Target.Combatant)
+	// guard has no target
+	if playerAction.Target == nil {
+		playerAction.Action.Execute(round.Player, nil)
+	} else {
+		playerAction.Action.Execute(round.Player, &playerAction.Target.Combatant)
+	}
 }
-func Start(player *Combatant, enemies ...*Enemy) *Combat {
+func Start(wg *sync.WaitGroup, player *Combatant, enemies ...*Enemy) *Combat {
 	rounds := make([]Round, 0)
 	playerActionChan := make(chan PlayerAction)
 	updateUi := make(chan bool)
@@ -64,6 +72,7 @@ func Start(player *Combatant, enemies ...*Enemy) *Combat {
 			if combat.Status != Playing {
 				close(combat.UpdateUi)
 				close(combat.PlayerActionChan)
+				wg.Done()
 			} else {
 				combat.StartNewRound()
 			}

@@ -5,26 +5,36 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"sync"
 	"useless_dragon/combat"
 	"useless_dragon/config"
 	"useless_dragon/setup"
 	"useless_dragon/termui"
+
+	tea "github.com/charmbracelet/bubbletea"
 )
 
 func main() {
+	wg := &sync.WaitGroup{}
 	config.Parse()
 	player := parsePlayer()
 	encounters := setup.ParseEncounters()
-	gcui := termui.Create()
-	defer gcui.Close()
-	for _, enemies := range encounters {
-		c := combat.Start(player, enemies...)
-		err := termui.RenderCombat(gcui, c)
-		if err != nil {
-			gcui.Close()
-			panic(err)
+	wg.Add(len(encounters))
+	updaterChan := make(chan *combat.Combat)
+	p := tea.NewProgram(termui.InitialModel(updaterChan))
+	go func(wg *sync.WaitGroup) {
+		if _, err := p.Run(); err != nil {
+			fmt.Printf("Alas, there's been an error: %v", err)
+			os.Exit(1)
 		}
+	}(wg)
+	for i, enemies := range encounters {
+		c := combat.Start(wg, player, enemies...)
+		log.Println("to start combat", i)
+		updaterChan <- c
+		log.Println("combat", i, "ended")
 	}
+	wg.Wait()
 }
 func parsePlayer() *combat.Combatant {
 	dir, err := os.Getwd()

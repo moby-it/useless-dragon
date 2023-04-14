@@ -4,107 +4,169 @@ import (
 	"fmt"
 	"useless_dragon/combat"
 
-	"github.com/jroimartin/gocui"
+	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/lipgloss"
 )
 
 const (
+	boxWidth        = 32
+	enemyBoxWidth   = 42
+	boxHeight       = 8
+	red             = lipgloss.Color("9")
+	blue            = lipgloss.Color("27")
+	gray            = lipgloss.Color("255")
+	hover           = lipgloss.Color("228")
+	updateCombatUI  = "updateCombatUI"
 	ActionsView     = "actions"
 	PlayerStatsView = "playerStats"
 	EnemyStatsView  = "enemyStats"
 )
 
-func Create() *gocui.Gui {
-	// if cannot create cui panic
-	g, _ := gocui.NewGui(gocui.Output256)
-	g.Cursor = true
-	g.Highlight = true
-	g.InputEsc = true
-	g.SelFgColor = gocui.ColorBlue
-	return g
-}
-func RenderCombat(g *gocui.Gui, c *combat.Combat) error {
-	g.SetManagerFunc(combatLayout(c))
-	registerCombatKeybindings(g, c)
-	go func(g *gocui.Gui, c *combat.Combat) {
-		for range c.UpdateUi {
-			UpdateUI(g, c)
-		}
-	}(g, c)
-	err := g.MainLoop()
-	if err == gocui.ErrQuit && c.Status == combat.Playing {
-		return fmt.Errorf("game crashed")
-	}
-	return nil
+var (
+	bold            = lipgloss.NewStyle().Bold(true)
+	headerStyle     = bold.Copy().Foreground(gray).MarginBottom(1)
+	hoverSyle       = lipgloss.NewStyle().Foreground(hover)
+	boxStyle        = lipgloss.NewStyle().MarginBottom(1).MarginTop(1).BorderStyle(lipgloss.NormalBorder()).Width(boxWidth).Height(boxHeight)
+	focusedBoxStyle = boxStyle.Copy().BorderForeground(blue)
+	statsStyle      = lipgloss.NewStyle().PaddingLeft(1).PaddingRight(1).Width(boxWidth).Height(boxHeight)
+	actionsStyle    = lipgloss.NewStyle().PaddingLeft(1).PaddingRight(1).Width(boxWidth).Height(5)
+)
+
+type model struct {
+	combat         *combat.Combat
+	cursor         int
+	selectedAction int
+	combatChan     chan *combat.Combat
 }
 
-func combatLayout(c *combat.Combat) func(*gocui.Gui) error {
-	return func(g *gocui.Gui) error {
-		createActions(g, c)
-		createPlayerStats(g, c)
-		for i := range c.Enemies {
-			err := createEnemyStats(g, c, i)
-			if err != nil {
-				return err
-			}
-		}
-		if g.CurrentView() == nil {
-			g.SetCurrentView(ActionsView)
-		}
-		if c.Status == combat.Won || c.Status == combat.Lost {
-			return gocui.ErrQuit
-		}
-		return nil
+func InitialModel(cUpdater chan *combat.Combat) model {
+	return model{
+		cursor:         0,
+		selectedAction: -1,
+		combatChan:     cUpdater,
 	}
+}
+func ListenForCombatChanges(m model) tea.Cmd {
+	return func() tea.Msg {
+		<-m.combat.UpdateUi
+		return updateCombatUI
+	}
+}
+func ListenForCombatCompletion(m model) func() tea.Msg {
+	return func() tea.Msg {
+		c := <-m.combatChan
+		return c
+	}
+}
+func (m model) Init() tea.Cmd {
+	return ListenForCombatCompletion(m)
+}
+func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+	switch msg := msg.(type) {
+	// Is it a key press?
+	case *combat.Combat:
+		m = model{
+			combat:         msg,
+			cursor:         0,
+			selectedAction: -1,
+			combatChan:     m.combatChan,
+		}
+	case string:
+		if msg == updateCombatUI {
+			m.cursor = 0
+			m.selectedAction = -1
+		}
+	case tea.KeyMsg:
+		if m.combat == nil {
+			return m, nil
+		}
+		key := msg.String()
+		// Cool, what was the actual key pressed?
+		switch key {
+		case "down":
+			if m.selectedAction < 0 && m.cursor < 2 {
+				m.cursor++
+			}
+			if m.selectedAction >= 0 && m.cursor < len(m.combat.Enemies)-1 {
+				m.cursor++
+			}
+		case "up":
+			if m.selectedAction < 0 && m.cursor > 0 {
+				m.cursor--
+			}
+			if m.selectedAction >= 0 && m.cursor > 0 {
+				m.cursor--
+			}
+		case "enter":
+			if m.selectedAction < 0 {
+				m.selectedAction = m.cursor
+				// guard has no target
+				if m.cursor == 2 {
+					playerAction := combat.PlayerAction{
+						Action: combat.CreateGuard(),
+					}
+					m.combat.PlayerActionChan <- playerAction
+				}
+				m.cursor = 0
+			} else {
+				playerAction, err := m.extractPlayerAction()
+				if err != nil {
+					return m, nil
+				}
+				m.combat.PlayerActionChan <- playerAction
+			}
+		case "esc":
+			if m.selectedAction >= 0 {
+				m.selectedAction = -1
+				m.cursor = 0
+			}
+		// These keys should exit the program.
+		case "ctrl+c", "q":
+			return m, tea.Quit
+		}
+	}
+	if m.combat != nil {
+		if m.combat.Status != combat.Playing {
+			m.combat = nil
+			return m, ListenForCombatCompletion(m)
+		} else {
+			return m, ListenForCombatChanges(m)
+		}
+	}
+	return m, nil
+}
+func (m model) View() string {
+	if m.combat == nil {
+		return ""
+	}
+	s := boxStyle.Render(renderCombatant(m.combat.Player))
+	s += renderActions(m)
+	s = lipgloss.JoinHorizontal(lipgloss.Top, s, renderEnemies(m))
+	return s
+}
 
-}
-func registerCombatKeybindings(g *gocui.Gui, c *combat.Combat) {
-	// keybidings
-	g.SetKeybinding(ActionsView, gocui.KeyCtrlC, gocui.ModNone, quit)
-	g.SetKeybinding(ActionsView, gocui.KeyArrowDown, gocui.ModNone, cursorDown)
-	g.SetKeybinding(ActionsView, gocui.KeyArrowUp, gocui.ModNone, cursorUp)
-	g.SetKeybinding(ActionsView, gocui.KeyEnter, gocui.ModNone, selectAction(c))
-	g.SetKeybinding("", gocui.KeyEnter, gocui.ModNone, selectEnemy(c))
-	g.SetKeybinding("", gocui.KeyArrowRight, gocui.ModNone, nextEnemy(c))
-	g.SetKeybinding("", gocui.KeyArrowLeft, gocui.ModNone, previousEnemy(c))
-	g.SetKeybinding("", gocui.KeyEsc, gocui.ModNone, cancelAction(c))
-}
-func quit(g *gocui.Gui, v *gocui.View) error {
-	return gocui.ErrQuit
-}
-func cursorDown(g *gocui.Gui, v *gocui.View) error {
-	_, cy := v.Cursor()
-	if cy < 5 {
-		if err := v.SetCursor(0, cy+1); err != nil {
-			ox, oy := v.Origin()
-			if err := v.SetOrigin(ox, oy+1); err != nil {
-				return err
-			}
+func (m model) extractPlayerAction() (combat.PlayerAction, error) {
+	var playerAction combat.PlayerAction
+	enemy := m.combat.Enemies[m.cursor]
+	if enemy.Health <= 0 {
+		return playerAction, fmt.Errorf("enemy has no hp")
+	}
+	switch m.selectedAction {
+	case 0:
+		playerAction = combat.PlayerAction{
+			Action: combat.CreateBasicAttack(),
+			Target: enemy,
+		}
+	case 1:
+		playerAction = combat.PlayerAction{
+			Action: combat.CreatePowerAttack(),
+			Target: enemy,
+		}
+	case 2:
+		playerAction = combat.PlayerAction{
+			Action: combat.CreateGuard(),
+			Target: enemy,
 		}
 	}
-	return nil
-}
-func cursorUp(g *gocui.Gui, v *gocui.View) error {
-	_, cy := v.Cursor()
-	if cy > 0 {
-		if err := v.SetCursor(0, cy-1); err != nil {
-			ox, oy := v.Origin()
-			if err := v.SetOrigin(ox, oy-1); err != nil {
-				return err
-			}
-		}
-	}
-	return nil
-}
-func UpdateUI(cui *gocui.Gui, c *combat.Combat) {
-	cui.Update(func(g *gocui.Gui) error {
-		// update actions
-		updateActions(g, c)
-		// update enemies
-		for i := range c.Enemies {
-			updateEnemyStats(g, c, i)
-		}
-		// update player stats
-		updatePlayerStats(g, c)
-		return nil
-	})
+	return playerAction, nil
 }

@@ -22,12 +22,11 @@ Each stance has a maximum duration of 3 turns initially (except for Human), afte
 
 ## Actions
 
-The player has access to four different actions during combat:
+The player has access to three different actions during combat:
 
 1. Basic Attack (BA): A standard attack that deals damage.
 2. Power Attack(PA): A stronger attack that deals more damage, but may have additional effects depending on the current stance.
 3. Guard(GA): A defensive move that reduces incoming damage and may have additional effects depending on the current stance.
-4. Taunt(TA): A move that provokes the enemy and may have additional effects depending on the current stance.
 
 Each action has a different effect depending on the current stance. For example, using a Power Attack in Drakonid (AS) stance deals more damage than using it in another stance.
 
@@ -48,7 +47,7 @@ Useless Dragon progresses in two ways. With **leveling up** and **Items**.
 
 As the player defeats monsters, they gain experience points (XP) that allow them to level up. Each level-up rewards the player with Mastery Points (MP) that they can invest in one of three skill trees: Aggressive, Defensive, and Normal.
 
-Here are some example skills:
+Here is how some example skills could look like:
 
  Name | Description 
 ------------|--------------- 
@@ -57,14 +56,13 @@ Dragon's Breath	| Breathe fire in Aggressive Stance after 3 rounds, dealing sign
 Arcane Channeling | Increased effectiveness for elemental spells and abilities when in Normal Stance.
 Vampiric Strikes	| Convert a percentage of damage dealt by Basic Attacks and Power Strikes into Health when in Aggressive Stance.
 Guardian's Aura	 | Provide damage reduction to nearby allies when in Defensive Stance.
-Quick Reflexes	| Gain a chance to dodge incoming attacks when in Normal Stance.
 
 
 ## Items
 
-In this game monsters will drop **Items** regarding what they carry when they fight you. Items are also stance related. 
+In this game monsters will drop **Items** regarding what they carry when they fight you. Items might also be stance related. 
 
-Here are some example items:
+Here are how some example items might look like:
 
  Name | Description 
 ------------|--------------- 

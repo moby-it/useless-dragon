@@ -57,18 +57,16 @@ func Start(player *Combatant, enemies ...*Enemy) *Combat {
 	round := NewRound(combat, player, enemies)
 	combat.Rounds = append(combat.Rounds, *round)
 	go func() {
-		for {
-			playerAction := <-combat.PlayerActionChan
+		for playerAction := range combat.PlayerActionChan {
 			combat.AddPlayerAction(&playerAction)
 			combat.ResolveRound()
+			combat.UpdateUi <- true
 			if combat.Status != Playing {
 				close(combat.UpdateUi)
 				close(combat.PlayerActionChan)
-				break
 			} else {
-				combat.UpdateUi <- true
+				combat.StartNewRound()
 			}
-			combat.StartNewRound()
 		}
 	}()
 	return combat

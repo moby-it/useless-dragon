@@ -1,7 +1,11 @@
-.PHONY: all build run
+.PHONY: all build run vendor
 
 run:
 	go run .
+
+vendor:
+	go mod tidy
+	go mod vendor
 
 prebuild:
 	rm -rf bin

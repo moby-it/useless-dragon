@@ -106,6 +106,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 						Action: combat.CreateGuard(),
 					}
 					m.combat.PlayerActionChan <- playerAction
+					return m, ListenForCombatChanges(m)
 				}
 				m.cursor = 0
 			} else {
@@ -114,6 +115,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 					return m, nil
 				}
 				m.combat.PlayerActionChan <- playerAction
+				return m, ListenForCombatChanges(m)
 			}
 		case "esc":
 			if m.selectedAction >= 0 {
@@ -129,8 +131,6 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		if m.combat.Status != combat.Playing {
 			m.combat = nil
 			return m, ListenForCombatCompletion(m)
-		} else {
-			return m, ListenForCombatChanges(m)
 		}
 	}
 	return m, nil

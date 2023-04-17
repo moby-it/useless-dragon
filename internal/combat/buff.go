@@ -4,7 +4,8 @@ import (
 	"fmt"
 	"log"
 	"strings"
-	"useless_dragon/config"
+
+	"github.com/moby-it/useless_dragon/internal/config"
 )
 
 const (

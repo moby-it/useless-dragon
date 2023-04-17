@@ -2,7 +2,8 @@ package termui
 
 import (
 	"fmt"
-	"useless_dragon/combat"
+
+	"github.com/moby-it/useless_dragon/internal/combat"
 )
 
 func renderStats(combatant *combat.Combatant, title string) string {

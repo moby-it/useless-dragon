@@ -1,4 +1,4 @@
-module useless_dragon
+module github.com/moby-it/useless_dragon
 
 go 1.20
 

@@ -5,7 +5,8 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"useless_dragon/combat"
+
+	"github.com/moby-it/useless_dragon/internal/combat"
 )
 
 type EnemyJSON struct {
@@ -25,8 +26,8 @@ func ParseEncounters() [][]*combat.Enemy {
 		panic(err)
 	}
 	encountersFilepath := filepath.Join(dir, "assets/encounters.json")
-	data, err := os.ReadFile(encountersFilepath)
-	if err != nil {
+	var data []byte
+	if data, err = os.ReadFile(encountersFilepath); err != nil {
 		panic(err)
 	}
 	var encounters [][]string

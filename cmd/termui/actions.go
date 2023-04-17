@@ -3,7 +3,8 @@ package termui
 import (
 	"fmt"
 	"strings"
-	"useless_dragon/config"
+
+	"github.com/moby-it/useless_dragon/internal/config"
 )
 
 func renderActions(m model) string {

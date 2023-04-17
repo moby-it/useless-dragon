@@ -1,6 +1,6 @@
 package combat
 
-import "useless_dragon/config"
+import "github.com/moby-it/useless_dragon/internal/config"
 
 type Executable interface {
 	Execute(initiator, receiver *Combatant)

@@ -4,7 +4,8 @@ MAIN_PATH=cmd/useless_dragon/main.go
 
 run:
 	go run $(MAIN_PATH)
-
+test:
+	go test ./... -v
 vendor:
 	go mod tidy
 	go mod vendor

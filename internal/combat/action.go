@@ -8,6 +8,10 @@ type Executable interface {
 type Calculatable interface {
 	Calculate(initiator *Combatant, receiver *Combatant) int
 }
+type Intent interface {
+	Executable
+	Calculatable
+}
 
 // Basic Attack
 

@@ -35,7 +35,7 @@ type Combatant struct {
 }
 type Enemy struct {
 	Combatant
-	Intents []Executable
+	Intents []Intent
 }
 type PlayerAction struct {
 	Action Executable

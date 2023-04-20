@@ -33,9 +33,8 @@ func setup(t *testing.T) (*combat.Combatant, []*combat.Enemy) {
 			Stance:  "Normal",
 			Buffs:   make(map[string]combat.Buff),
 		},
-		Intents: []combat.Executable{
+		Intents: []combat.Intent{
 			combat.CreateBasicAttack(),
-			combat.CreatePowerAttack(),
 			combat.CreatePowerAttack(),
 			combat.CreatePowerAttack(),
 		},
@@ -47,6 +46,7 @@ func TestCombatStart(t *testing.T) {
 	t.Log("When a combat starts")
 	player, enemies := setup(t)
 	enemyInitialHealth := enemies[0].Health
+	playerInitialHealth := player.Health
 	c := combat.Start(wg, player, enemies...)
 	{
 		if c.Player.Health == 100 && len(c.Enemies) > 0 {
@@ -54,6 +54,9 @@ func TestCombatStart(t *testing.T) {
 		} else {
 			t.Fatalf("\t run a smoke Test %v", Failed)
 		}
+		firstEnemy := enemies[0]
+		playerAttackDamage := combat.CreateBasicAttack().Calculate(c.Player, &firstEnemy.Combatant)
+		enemyAttackDamage := firstEnemy.Intents[0].Calculate(&firstEnemy.Combatant, player)
 		t.Log("When the player does a basic attack")
 		{
 			action := combat.PlayerAction{
@@ -67,12 +70,18 @@ func TestCombatStart(t *testing.T) {
 			case <-time.After(1 * time.Second):
 				t.Fatalf("\t UpdateUi channel should receive a value %v", Failed)
 			}
-			firstEnemy := enemies[0]
-			attackDamage := combat.CreateBasicAttack().Calculate(c.Player, &firstEnemy.Combatant)
-			if firstEnemy.Health == enemyInitialHealth-attackDamage {
+			if firstEnemy.Health == enemyInitialHealth-playerAttackDamage {
 				t.Logf("\t Enemy remaining Health should equal Starting Health - Attack Damage %v", Success)
 			} else {
 				t.Logf("\t Enemy remaining Health should equal Starting Health - Attack Damage %v", Failed)
+			}
+		}
+		t.Log("After the round is resolved")
+		{
+			if c.Player.Health == playerInitialHealth-enemyAttackDamage {
+				t.Logf("\t Player remaining Health should equal Starting Health - Enemy First Intent Damage %v", Success)
+			} else {
+				t.Logf("\t Player remaining Health should equal Starting Health - Enemy First Intent Damage %v", Failed)
 			}
 		}
 	}

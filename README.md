@@ -8,6 +8,9 @@ Our hero is the Useless Dragon. Dragons have the ability to transform into human
 
 In our roguelike game, Useless Dragon sets out on an adventure to trigger his dormant dragon abilities and prove to everyone that he is not a useless dragon after all.
 
+The current state of the game is not even considered alpha. We paused development and brainstoring for the moment and prioritized other things. We resume development at some point in 2024*
+
+
 # Combat
 
 ## Stances

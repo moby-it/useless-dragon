@@ -1,5 +1,5 @@
 # USELESS DRAGON
-
+some readme changes
 ## Introduction
 
 Welcome to Useless Dragon, a terminal-based roguelike game where you play as a dragon brought up in a society of dragons who can transform into humans.
